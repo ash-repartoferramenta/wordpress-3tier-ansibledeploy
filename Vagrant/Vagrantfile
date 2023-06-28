@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#web server ip
+VWEBIP = "192.168.60.8"
+#this is the ip where the mysql service will be bound
+VDBIP = "192.168.60.9"
+#Subnet network of the app
+VSUB = "255.255.255.0"
+#Vagrant API
+VAGRANTFILE_API_VERSION = '2'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+   # General config
+   config.vm.box = "generic/centos9s"
+   config.ssh.insert_key = false
+   config.vm.provider :virtualbox do |v|
+     v.memory = 2560
+     v.linked_clone = true
+   end
+    # Database server
+   config.vm.define "vmdb" do |vmdb|
+     vmdb.vm.hostname = "db.wordpress"
+     vmdb.vm.network :private_network, ip: VDBIP, netmask: VSUB
+   end
+    # Web server 
+   config.vm.define "vmapp" do |vmapp|
+     vmapp.vm.hostname = "app.wordpress"
+     vmapp.vm.network  :private_network, ip: VWEBIP, netmask: VSUB
+    # Ansible Playbook provisioning
+   vmapp.vm.provision "ansible" do |ansible|
+     ansible.playbook = "../site.yml"
+     ansible.limit = "all"
+     ansible.extra_vars = {
+      dbip: VDBIP,webip: VWEBIP
+     }
+     ansible.groups = {
+      "db" => ["vmdb"],
+      "app" => ["vmapp"]
+     }
+     end
+   end 
+end
+

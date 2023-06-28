@@ -1,0 +1,12 @@
+---
+#root user for mariadb
+mariadbroot: my-root-pwd
+#db user for mariadb
+masteruser: my-db-user
+#db password to access the new db
+masterpassword: my-db-password
+#host that will access the newly created db
+webip: "192.168.60.7"
+#bind ip for sql service 
+dbip: "192.168.60.9"
+

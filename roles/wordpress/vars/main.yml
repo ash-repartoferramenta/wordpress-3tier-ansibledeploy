@@ -1,0 +1,6 @@
+---
+masteruser: my-db-user
+masterpassword: my-db-password
+webip: "192.168.60.7"
+dbip: "192.168.60.9"
+subnet: "255.255.255.0"

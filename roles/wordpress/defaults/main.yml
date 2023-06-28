@@ -1,0 +1,4 @@
+---
+dbname: wp-database
+mysql_port: "3306"
+db_prefix: "wp_"

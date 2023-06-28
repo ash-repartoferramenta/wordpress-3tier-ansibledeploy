@@ -1,0 +1,30 @@
+---
+      - name: Install lamp stack (web server)
+        yum: name={{ item }} state=present
+        with_items:
+         - php
+         - php-common
+         - php-gd
+         - php-mysqlnd
+         - php-pdo
+         - php-cli
+         - httpd      
+      - name: Start and enable apache service
+        ansible.builtin.service:
+           name: httpd
+           state: started
+           enabled: yes
+      - name: Permanent firewall exclusion for apache
+        ansible.posix.firewalld:
+           permanent: true
+           immediate: true
+           state: enabled
+           service: http
+      - name: Permit apache to db SElinux 
+        ansible.posix.seboolean:
+           name: httpd_can_network_connect_db 
+           state: true
+           persistent: true
+
+ 
+ 

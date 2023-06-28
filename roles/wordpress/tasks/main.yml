@@ -1,0 +1,58 @@
+---
+       - name: Download wordpress
+         ansible.builtin.get_url:
+           url: https://wordpress.org/latest
+           dest: /var/www/html/
+         register: wptar
+
+       - name: Untar wordpress
+         ansible.builtin.unarchive:
+           dest: /tmp
+           src: "{{wptar.dest}}"
+           remote_src: yes
+           owner: root
+           group: root
+           setype: httpd_sys_content_t
+
+       - name: Copy wordpress to /var/www/html
+         ansible.builtin.copy:
+           src: /tmp/wordpress/
+           dest: /var/www/html/
+           remote_src: true
+           directory_mode: 0755
+           mode: 0755
+
+       - name: Copy wp-config.php to host
+         ansible.builtin.template:
+           src: ../templates/wp-config.php.j2
+           dest: /var/www/html/wp-config.php
+           owner: root
+           group: root
+           mode: '0644'
+           setype: httpd_sys_content_t
+
+       - name: Get salt from wordpress API 
+         uri:
+           url: "https://api.wordpress.org/secret-key/1.1/salt/"
+           method: GET
+           return_content: true
+         register: api_info
+
+       - name: Adding api salt to wp-config
+         ansible.builtin.lineinfile:
+           path: /var/www/html/wp-config.php
+           insertafter: "//Unique keys and salts"
+           line: "{{ api_info.content }}"
+      
+       - name: Wordpress tar cleanup
+         ansible.builtin.file: 
+           path: "{{wptar.dest}}" 
+           state: absent
+           
+       - name: Wordpress folder  cleanup
+         ansible.builtin.file:
+           state: absent
+           path: /tmp/wordpress/
+      
+       - name: Apply SElinux context
+         ansible.builtin.command: restorecon -irv /var/www/html/*

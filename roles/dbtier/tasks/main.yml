@@ -1,0 +1,55 @@
+---     
+      - name: install lamp stack (database) 
+        yum: name={{ item }} state=present
+        with_items:
+         - mariadb-server
+         - python3-mysqlclient
+
+      - name: Start and enable mariadb server
+        ansible.builtin.service:
+         name: mariadb
+         state: started
+         enabled: yes
+
+      - name: Initialize mariadb root
+        community.mysql.mysql_user:
+         login_user: root
+         login_password: "{{mariadbroot}}"
+         check_implicit_admin: true
+         name: root
+         password: "{{mariadbroot}}"
+
+      - name: Create database
+        community.mysql.mysql_db:
+         login_user: root
+         login_password: "{{mariadbroot}}"
+         name: "{{dbname}}"
+         state: present
+
+      - name: Create master user
+        community.mysql.mysql_user:
+         login_user: root
+         login_password: "{{mariadbroot}}"
+         name: "{{masteruser}}"
+         password: "{{masterpassword}}"
+         priv: '*.*:ALL'
+         state: present
+         host: "{{ webip }}"
+
+#      - name: Copy my.cfn to host
+#        ansible.builtin.template:
+#         src: ../templates/ansible.cnf.j2
+#         dest: /etc/my.cnf.d/ansible.cnf
+#         owner: root
+#         group: root
+#         mode: '0644'
+#        notify:
+#        - Restart mariadb
+
+      - name: Permanent firewall exclusion for mariadb
+        ansible.posix.firewalld:
+         permanent: true
+         immediate: true
+         rich_rule: rule family=ipv4 source address="{{ webip }}"  port port="{{mysql_port}}" protocol=tcp accept
+         state: enabled
+          

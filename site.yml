@@ -1,0 +1,13 @@
+---
+- name: Wordpress 3-tier deploy (db)
+  hosts: db
+  roles:
+    - role: dbtier
+      become: yes
+- name: Wordpress 3-tier deploy (web)
+  hosts: app
+  roles:
+    - role: webtier
+      become: yes
+    - role: wordpress
+      become: yes
