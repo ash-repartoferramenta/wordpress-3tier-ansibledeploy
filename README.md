@@ -1,6 +1,6 @@
 # Automate the deploy of a simple 3-tier Wordpress app running on Centos 9 Stream
 
-## Before we begins
+## Before we begin
 **Requirements**
 - HashiCorp Vagrant for building and deploying virtual inftractructures
 >  https://developer.hashicorp.com/vagrant/downloads
