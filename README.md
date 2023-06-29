@@ -30,6 +30,7 @@ vagrant up
 Vagrant will auto-generate an inventory for ansible with the informations provided in its Vagrantfile.
 It's therefore important to set up correctly some variables.
 
+
 **Security concerns:**
 For the sake of ease of use, this Vagrantfile is set to utilize the default insecure ssh key provided by Vagrant
 
@@ -37,6 +38,7 @@ For the sake of ease of use, this Vagrantfile is set to utilize the default inse
 - VWEBIP : this is the private network address that Vagrant will assign to the web server, it's used in absible to permit access from this host to mariadb
 - VDIP: this is the private network address that Vagrant will assign to the database, it's used in ansible to bind mariadb service to this ip
 - VSUB: subnet mask of the private network
+- v.memory: how much memory will be allocated to both VMs
 
 PS.
 though it's possible to obtain network informations directly from ansible I chose to pass VWEBIP and VDIP to ansible as special vars in case the VMs has multiple interfaces like 
